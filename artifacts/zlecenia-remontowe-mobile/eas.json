@@ -3,7 +3,8 @@
     "production": {
       "android": {
         "buildType": "app-bundle"
-      }
+      },
+      "pnpm": "10.26.1"
     }
   }
 }
