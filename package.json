@@ -18,5 +18,6 @@
     "playwright": "^1.62.1",
     "prettier": "^3.9.6",
     "typescript": "~5.9.3"
-  }
+  },
+  "packageManager": "pnpm@10.26.1"
 }
