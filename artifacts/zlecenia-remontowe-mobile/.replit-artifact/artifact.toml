@@ -1,0 +1,24 @@
+kind = "mobile"
+previewPath = "/mobile/"
+title = "Zleć Majstra Mobile"
+description = "Mobilna aplikacja dla klientów indywidualnych publikujących prace remontowe oraz dla fachowców i firm przeglądających zlecenia i odblokowujących kontakty w ramach subskrypcji."
+version = "1.0.0"
+id = "artifacts/zlecenia-remontowe-mobile"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/mobile/" ]
+localPort = 23447
+
+[services.development]
+run = "pnpm --filter @workspace/zlecenia-remontowe-mobile run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/zlecenia-remontowe-mobile", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/zlecenia-remontowe-mobile", "run", "serve" ]
+
+[services.env]
+PORT = "23447"
+BASE_PATH = "/mobile/"

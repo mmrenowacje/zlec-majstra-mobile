@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Zleć Majstra",
+    "slug": "zlemajstra",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "zlemajstra",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F6F3ED"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.zlemajstra.app"
+    },
+    "android": {
+      "package": "com.zlecmajstra.app",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://replit.com/"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

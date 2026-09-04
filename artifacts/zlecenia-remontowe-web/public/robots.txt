@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://zlecmajstra.pl/sitemap.xml

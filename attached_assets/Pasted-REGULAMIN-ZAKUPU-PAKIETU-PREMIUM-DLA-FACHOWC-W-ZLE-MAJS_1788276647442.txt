@@ -1,0 +1,25 @@
+REGULAMIN ZAKUPU PAKIETU PREMIUM DLA FACHOWCÓW "ZLEĆ MAJSTRA" - PŁATNOŚCI PayU
+§3 Cena i Płatności - WERSJA PayU [ZMIENIONE]
+1. Cena Pakietu wynosi 99,00 zł brutto miesięcznie. Zobowiązanie na 12 miesięcy. Łączny koszt roczny 1 188,00 zł brutto.
+2. Operatorem płatności jest PayU S.A. z siedzibą w Poznaniu, ul. Grunwaldzka 186, 60-166 Poznań, KRS 0000274399.
+3. Model płatności: Subskrypcja cykliczna miesięczna PayU.
+a) Pierwsza płatność 99,00 zł pobierana jest w dniu zakupu Pakietu poprzez bramkę PayU (karta, BLIK, przelew).
+b) Kolejne 11 płatności po 99,00 zł pobierane jest automatycznie co miesiąc, w rocznicę zakupu, z zapisanej karty płatniczej lub za zgodą na obciążenia cykliczne PayU. Klient wyraża zgodę na przechowywanie tokenu karty przez PayU w celu realizacji płatności cyklicznych.
+c) 3 dni przed każdą płatnością PayU wyśle przypomnienie na e-mail.
+d) W przypadku niepowodzenia pobrania (np. brak środków, wygasła karta), PayU ponowi próbę po 48h i 72h. Po 3 nieudanych próbach konto Premium zostaje zawieszone do czasu uregulowania płatności.
+4. Zarządzanie subskrypcją:
+Możesz w każdej chwili zaktualizować kartę, zmienić na BLIK cykliczny lub anulować przyszłe odnowienie po 12 miesiącach w: Profil > Subskrypcja > Zarządzaj płatnościami (przekierowanie do panelu PayU) lub pisząc na aplikacjegniezno@int.pl 
+5. Faktury VAT wystawiane automatycznie przez MM Renowacje Monika Marcinkowska po każdej udanej płatności PayU i wysyłane na e-mail.
+Reszta regulaminu bez zmian:
+§4 Czas Trwania: 12 miesięcy zobowiązania, potem przechodzi na czas nieokreślony 99 zł/mies. z możliwością anulowania w aplikacji.
+§5 Odstąpienie: B2B brak odstąpienia. Konsument traci prawo jeśli zaczął korzystać z Premium - musi zaznaczyć zgodę przy płatności PayU.
+Co musisz zaznaczyć w koszyku przy PayU - obowiązkowe checkboxy:
+Wklej to nad przyciskiem "Kupuję i płacę PayU":
+[x] Akceptuję Regulamin Pakietu Premium i Regulamin Aplikacji Zleć Majstra oraz Politykę Prywatności
+[x] Wyrażam zgodę na rozpoczęcie świadczenia Pakietu Premium przed upływem 14 dni na odstąpienie i przyjmuję do wiadomości utratę prawa do odstąpienia po skorzystaniu z funkcji Premium.
+[x] Wyrażam zgodę na zapisanie mojej karty / metody płatności w PayU i na automatyczne cykliczne pobieranie opłaty 99,00 zł co miesiąc przez 12 miesięcy w ramach subskrypcji Zleć Majstra.
+Bez tych 3 zgód PayU odrzuci Ci wniosek o płatności cykliczne.
+Do zrobienia w panelu PayU:
+1.	W PayU > Moje sklepy > Zgłoś wniosek o płatności cykliczne / subskrypcje
+2.	Wklej link do tego regulaminu: zlecmajstra.pl/regulamin-pakietu
+3.	Jako opis usługi podaj: Subskrypcja cyfrowa - dostęp do platformy łączącej klientów z fachowcami

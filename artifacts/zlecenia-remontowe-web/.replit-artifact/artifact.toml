@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Zleć Majstra"
+description = "Responsywna platforma webowa, na której klienci publikują zlecenia remontowe, budowlane, hydrauliczne i elektryczne, a firmy i fachowcy znajdują nowe prace oraz odblokowują dane kontaktowe w ramach subskrypcji."
+version = "1.0.0"
+id = "artifacts/zlecenia-remontowe-web"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19350
+
+[services.development]
+run = "pnpm --filter @workspace/zlecenia-remontowe-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/zlecenia-remontowe-web", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/zlecenia-remontowe-web/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19350"
+BASE_PATH = "/"

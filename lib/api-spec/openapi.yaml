@@ -1,0 +1,1419 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Zleć Majstra — platforma łącząca klientów z fachowcami
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: profile
+    description: Profile and account operations
+  - name: requests
+    description: Customer job requests
+  - name: dashboard
+    description: Dashboard summaries
+  - name: billing
+    description: Contractor subscription access
+  - name: admin
+    description: Administrator moderation and subscription management
+  - name: storage
+    description: Persistent image upload and serving
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /me:
+    get:
+      operationId: getMyProfile
+      tags: [profile]
+      summary: Get current profile
+      responses:
+        "200":
+          description: Current profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+    patch:
+      operationId: updateMyProfile
+      tags: [profile]
+      summary: Save the current user's application profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileInput"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "401":
+          description: Authentication required
+        "422":
+          description: Clerk account has no verified email
+  /contractors/{contractorId}/profile:
+    get:
+      operationId: getContractorProfile
+      tags: [profile]
+      summary: Get a public contractor profile
+      parameters:
+        - name: contractorId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Public contractor profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractorProfile"
+        "404":
+          description: Contractor not found
+  /requests:
+    get:
+      operationId: listRequests
+      tags: [requests]
+      summary: List job requests
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: mine
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Job requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobRequest"
+    post:
+      operationId: createRequest
+      tags: [requests]
+      summary: Create a job request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobRequestInput"
+      responses:
+        "201":
+          description: Created job request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRequest"
+  /requests/{id}:
+    get:
+      operationId: getRequest
+      tags: [requests]
+      summary: Get a job request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Job request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRequest"
+        "404":
+          description: Request not found
+    patch:
+      operationId: updateRequest
+      tags: [requests]
+      summary: Update a job request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobRequestUpdate"
+      responses:
+        "200":
+          description: Updated job request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRequest"
+  /requests/{id}/unlock:
+    post:
+      operationId: unlockRequestContact
+      tags: [requests]
+      summary: Unlock customer contact details
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Contact access result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactAccess"
+        "402":
+          description: Active contractor subscription required
+  /requests/{id}/conversation:
+    get:
+      operationId: getRequestConversation
+      tags: [requests]
+      summary: Get a conversation for a request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Conversation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Conversation" }
+        "403": { description: Conversation access denied }
+    post:
+      operationId: startRequestConversation
+      tags: [requests]
+      summary: Start a conversation as an active contractor
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "201":
+          description: Conversation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Conversation" }
+        "402": { description: Active contractor subscription required }
+  /requests/{id}/conversation/messages:
+    post:
+      operationId: sendConversationMessage
+      tags: [requests]
+      summary: Send a conversation message
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConversationMessageInput" }
+      responses:
+        "201":
+          description: Message
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversationMessage" }
+  /requests/{id}/conversation/share-contact:
+    post:
+      operationId: shareRequestContact
+      tags: [requests]
+      summary: Share customer contact details with the contractor
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Updated conversation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Conversation" }
+  /requests/{id}/conversations:
+    get:
+      operationId: listRequestConversations
+      tags: [requests]
+      summary: List customer conversations for a request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Conversation" }
+        "403": { description: Only the request owner can list conversations }
+  /requests/{id}/conversations/{conversationId}:
+    get:
+      operationId: getRequestConversationById
+      tags: [requests]
+      summary: Get a selected customer conversation
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/ConversationId"
+      responses:
+        "200":
+          description: Conversation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Conversation" }
+        "403": { description: Conversation access denied }
+  /requests/{id}/conversations/{conversationId}/messages:
+    post:
+      operationId: sendConversationMessageById
+      tags: [requests]
+      summary: Send a message to a selected customer conversation
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/ConversationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConversationMessageInput" }
+      responses:
+        "201":
+          description: Message
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversationMessage" }
+  /requests/{id}/conversations/{conversationId}/share-contact:
+    post:
+      operationId: shareRequestContactById
+      tags: [requests]
+      summary: Share contact in a selected customer conversation
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/ConversationId"
+      responses:
+        "200":
+          description: Updated conversation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Conversation" }
+  /notifications:
+    get:
+      operationId: getNotifications
+      tags: [profile]
+      summary: Get safe notifications for the current user
+      responses:
+        "200":
+          description: Unread conversation notifications without contact data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationSummary"
+        "401":
+          description: Authentication required
+  /requests/{id}/review-candidates:
+    get:
+      operationId: listReviewCandidates
+      tags: [requests]
+      summary: List contractors eligible for a review
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Contractors who unlocked contact for the completed request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReviewCandidate"
+        "401":
+          description: Authentication required
+        "403":
+          description: Customer ownership required
+        "404":
+          description: Request not found
+  /requests/{id}/reviews:
+    get:
+      operationId: listRequestReviews
+      tags: [requests]
+      summary: List reviews for a request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: Reviews visible to the current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+        "401":
+          description: Authentication required
+        "403":
+          description: Access to this request's reviews is not allowed
+        "404":
+          description: Request not found
+    post:
+      operationId: createRequestReview
+      tags: [requests]
+      summary: Add a review for a contractor
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid review
+        "401":
+          description: Authentication required
+        "403":
+          description: Review eligibility requirements are not met
+        "409":
+          description: Review already exists
+  /requests/{id}/reviews/{reviewId}/reply:
+    post:
+      operationId: createReviewReply
+      tags: [requests]
+      summary: Reply to a contractor review
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/ReviewId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewReplyInput"
+      responses:
+        "201":
+          description: Review reply created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid reply
+        "401":
+          description: Authentication required
+        "403":
+          description: Only the reviewed contractor can reply
+        "404":
+          description: Review not found
+  /requests/{id}/reviews/{reviewId}/photos:
+    post:
+      operationId: addProjectPhoto
+      tags: [requests]
+      summary: Add a completed project photo to a reviewed contractor
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/ReviewId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectPhotoInput"
+      responses:
+        "201":
+          description: Project photo added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectPhoto"
+        "403":
+          description: Only the reviewed contractor may add photos
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [storage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+  /storage/objects/{objectPath}:
+    get:
+      operationId: getStorageObject
+      tags: [storage]
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Stored image
+          content:
+            image/*:
+              schema: { type: string, format: binary }
+        "409":
+          description: Reply already exists
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /billing/subscription:
+    get:
+      operationId: getSubscription
+      tags: [billing]
+      summary: Get contractor subscription status
+      responses:
+        "200":
+          description: Subscription status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+    post:
+      operationId: startSubscription
+      tags: [billing]
+      summary: Start PayU checkout for the contractor subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionInput"
+      responses:
+        "201":
+          description: PayU checkout created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentCheckout"
+  /billing/payments/{extOrderId}:
+    get:
+      operationId: getPaymentStatus
+      tags: [billing]
+      summary: Get the current user's PayU payment status
+      parameters:
+        - name: extOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentStatus"
+        "404":
+          description: Payment not found
+  /billing/payu/notifications:
+    post:
+      operationId: receivePayuNotification
+      tags: [billing]
+      summary: Receive a signed PayU order status notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PayuNotificationInput"
+      responses:
+        "204":
+          description: Notification accepted
+        "400":
+          description: Invalid notification
+        "401":
+          description: Invalid signature
+  /site/settings:
+    get:
+      operationId: getSiteSettings
+      tags: [marketplace]
+      summary: Get public platform settings
+      responses:
+        "200":
+          description: Public platform settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+  /chatbot/messages:
+    post:
+      operationId: sendChatbotMessage
+      tags: [marketplace]
+      summary: Send a message to the configured support chatbot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatbotMessageInput"
+      responses:
+        "200":
+          description: Chatbot reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatbotReply"
+        "400":
+          description: Invalid message
+        "404":
+          description: Chatbot is disabled
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      summary: Get platform-wide statistics for administrators
+      responses:
+        "200":
+          description: Platform statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+  /admin/settings:
+    get:
+      operationId: getAdminSettings
+      tags: [admin]
+      summary: Get editable platform and chatbot settings
+      responses:
+        "200":
+          description: Platform settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSettings"
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+    patch:
+      operationId: updateAdminSettings
+      tags: [admin]
+      summary: Update platform and chatbot settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminSettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSettings"
+        "400":
+          description: Invalid settings
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+  /admin/subscriptions:
+    get:
+      operationId: listAdminSubscriptions
+      tags: [admin]
+      summary: List contractor subscription requests for administrators
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, active, inactive, canceled, all]
+            default: pending
+      responses:
+        "200":
+          description: Contractor subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminSubscription"
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: List customer and contractor accounts for administrators
+      parameters:
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [customer, contractor, all]
+            default: all
+      responses:
+        "200":
+          description: User accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+  /admin/users/{profileId}:
+    patch:
+      operationId: updateAdminUser
+      tags: [admin]
+      summary: Block or unblock a user account
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserUpdate"
+      responses:
+        "200":
+          description: Updated user account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "400":
+          description: Invalid action or protected account
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+        "404":
+          description: User not found
+    delete:
+      operationId: deleteAdminUser
+      tags: [admin]
+      summary: Delete a customer or contractor account
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Account deleted
+        "400":
+          description: Protected account cannot be deleted
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+        "404":
+          description: User not found
+  /admin/requests:
+    get:
+      operationId: listAdminRequests
+      tags: [admin]
+      summary: List job requests for administrators
+      responses:
+        "200":
+          description: Job requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminRequest"
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+  /admin/requests/{id}:
+    patch:
+      operationId: updateAdminRequest
+      tags: [admin]
+      summary: Block or unblock a job request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminRequestUpdate"
+      responses:
+        "200":
+          description: Updated job request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminRequest"
+        "400":
+          description: Invalid action
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Job request not found
+    delete:
+      operationId: deleteAdminRequest
+      tags: [admin]
+      summary: Delete a job request
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "204":
+          description: Job request deleted
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Job request not found
+  /admin/subscriptions/{profileId}:
+    get:
+      operationId: listAdminSubscriptionHistory
+      tags: [admin]
+      summary: List subscription status changes for administrators
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Subscription status history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminSubscriptionStatusHistory"
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Contractor subscription not found
+    patch:
+      operationId: updateAdminSubscription
+      tags: [admin]
+      summary: Change a contractor subscription status
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminSubscriptionUpdate"
+      responses:
+        "200":
+          description: Updated contractor subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSubscription"
+        "400":
+          description: Invalid status
+        "401":
+          description: Authentication required
+        "403":
+          description: Administrator access required
+        "404":
+          description: Contractor subscription not found
+components:
+  parameters:
+    RequestId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    ReviewId:
+      name: reviewId
+      in: path
+      required: true
+      schema:
+        type: integer
+    ConversationId:
+      name: conversationId
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Profile:
+      type: object
+      required: [id, role, firstName, lastName, email, phone, verified, companyName, companyAddress, nip, profileImageUrl]
+      properties:
+        id: { type: string }
+        role:
+          type: string
+          enum: [customer, contractor, admin]
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        companyName: { type: ["string", "null"] }
+        companyAddress: { type: ["string", "null"] }
+        serviceLocation: { type: ["string", "null"] }
+        nip: { type: ["string", "null"] }
+        profileImageUrl: { type: ["string", "null"] }
+        verified: { type: boolean }
+        isBlocked: { type: boolean }
+        blockedAt: { type: ["string", "null"], format: date-time }
+        blockedReason: { type: ["string", "null"] }
+    ProfileInput:
+      type: object
+      required: [role, firstName, lastName, phone]
+      properties:
+        role:
+          type: string
+          enum: [customer, contractor]
+        firstName: { type: string, minLength: 1 }
+        lastName: { type: string, minLength: 1 }
+        phone: { type: string, minLength: 7 }
+        companyName: { type: ["string", "null"], minLength: 2 }
+        companyAddress: { type: ["string", "null"], minLength: 3 }
+        serviceLocation: { type: ["string", "null"], minLength: 2 }
+        nip: { type: ["string", "null"], pattern: "^[0-9]{10}$" }
+    ContractorProfile:
+      type: object
+      required: [id, firstName, lastName, companyName, companyAddress, serviceLocation, nip, profileImageUrl, verified, averageRating, reviewCount, completedProjects]
+      properties:
+        id: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        companyName: { type: ["string", "null"] }
+        companyAddress: { type: ["string", "null"] }
+        serviceLocation: { type: ["string", "null"] }
+        nip: { type: ["string", "null"] }
+        profileImageUrl: { type: ["string", "null"] }
+        verified: { type: boolean }
+        averageRating: { type: number, minimum: 0, maximum: 5 }
+        reviewCount: { type: integer, minimum: 0 }
+        completedProjects:
+          type: array
+          items: { $ref: "#/components/schemas/ProjectPhoto" }
+    JobRequest:
+      type: object
+      required: [id, customerName, title, description, category, location, address, budget, status, createdAt, contactAvailable]
+      properties:
+        id: { type: integer }
+        customerName: { type: string }
+        title: { type: string }
+        description: { type: string }
+        category:
+          type: string
+          enum: [hydraulik, elektryk, malarz, stolarz, plytkarz, brukarz, dekarz, wykonczenia, zlota-raczka, inne, remont, budowa, hydraulika, elektryka]
+        location: { type: string }
+        address: { type: ["string", "null"] }
+        budget: { type: string }
+        status:
+          type: string
+          enum: [open, in_progress, completed]
+        createdAt: { type: string, format: date-time }
+        photos:
+          type: array
+          items: { type: string }
+        contactAvailable: { type: boolean }
+        customerEmail: { type: ["string", "null"] }
+        customerPhone: { type: ["string", "null"] }
+    JobRequestInput:
+      type: object
+      required: [title, description, category, location, address, budget]
+      properties:
+        title: { type: string, minLength: 3 }
+        description: { type: string, minLength: 10 }
+        category:
+          type: string
+          enum: [hydraulik, elektryk, malarz, stolarz, plytkarz, brukarz, dekarz, wykonczenia, zlota-raczka, inne, remont, budowa, hydraulika, elektryka]
+        location: { type: string, minLength: 2 }
+        address: { type: string, minLength: 3 }
+        budget: { type: string }
+        photos:
+          type: array
+          items: { type: string }
+    JobRequestUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 3 }
+        description: { type: string, minLength: 10 }
+        category:
+          type: string
+          enum: [hydraulik, elektryk, malarz, stolarz, plytkarz, brukarz, dekarz, wykonczenia, zlota-raczka, inne, remont, budowa, hydraulika, elektryka]
+        location: { type: string }
+        address: { type: string, minLength: 3 }
+        budget: { type: string }
+        status:
+          type: string
+          enum: [open, in_progress, completed]
+        photos:
+          type: array
+          maxItems: 2
+          items: { type: string, pattern: "^/objects/uploads/[a-f0-9-]+$" }
+    ReviewCandidate:
+      type: object
+      required: [id, displayName, reviewed]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        reviewed: { type: boolean }
+    ReviewReply:
+      type: object
+      required: [id, contractorId, body, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        contractorId: { type: string }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Review:
+      type: object
+      required: [id, requestId, contractorId, contractorName, rating, body, photos, createdAt, updatedAt, reply]
+      properties:
+        id: { type: integer }
+        requestId: { type: integer }
+        contractorId: { type: string }
+        contractorName: { type: string }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        body: { type: string, minLength: 1, maxLength: 500 }
+        photos:
+          type: array
+          items: { $ref: "#/components/schemas/ProjectPhoto" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        reply:
+          oneOf:
+            - $ref: "#/components/schemas/ReviewReply"
+            - type: "null"
+    ReviewInput:
+      type: object
+      required: [contractorId, rating, body]
+      properties:
+        contractorId: { type: string, minLength: 1 }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        body: { type: string, minLength: 1, maxLength: 500 }
+    ReviewReplyInput:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1, maxLength: 500 }
+    ProjectPhoto:
+      type: object
+      required: [id, reviewId, requestId, contractorId, objectPath, imageUrl, createdAt]
+      properties:
+        id: { type: integer }
+        reviewId: { type: integer }
+        requestId: { type: integer }
+        contractorId: { type: string }
+        objectPath: { type: string }
+        imageUrl: { type: string }
+        createdAt: { type: string, format: date-time }
+    ProjectPhotoInput:
+      type: object
+      required: [objectPath]
+      properties:
+        objectPath: { type: string, pattern: "^/objects/uploads/[a-f0-9-]+$" }
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1, maximum: 52428800 }
+        contentType: { type: string, pattern: "^image/(jpeg|png|webp)$" }
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+    ContactAccess:
+      type: object
+      required: [requestId, unlocked, message]
+      properties:
+        requestId: { type: integer }
+        unlocked: { type: boolean }
+        message: { type: string }
+        customerEmail: { type: ["string", "null"] }
+        customerPhone: { type: ["string", "null"] }
+    Conversation:
+      type: object
+      required: [id, requestId, customerId, contractorId, customerContactShared, customerContactSharedAt, messages, contractorName, contractorAverageRating, contractorReviewCount, contractorReviews, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        requestId: { type: integer }
+        customerId: { type: string }
+        contractorId: { type: string }
+        contractorName: { type: string }
+        contractorAverageRating: { type: number, minimum: 0, maximum: 5 }
+        contractorReviewCount: { type: integer, minimum: 0 }
+        contractorReviews:
+          type: array
+          items: { $ref: "#/components/schemas/Review" }
+        customerContactShared: { type: boolean }
+        customerContactSharedAt: { type: ["string", "null"], format: date-time }
+        customerPhone: { type: ["string", "null"] }
+        customerEmail: { type: ["string", "null"] }
+        messages:
+          type: array
+          items: { $ref: "#/components/schemas/ConversationMessage" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ConversationMessage:
+      type: object
+      required: [id, conversationId, senderId, body, readAt, createdAt]
+      properties:
+        id: { type: integer }
+        conversationId: { type: integer }
+        senderId: { type: string }
+        body: { type: string }
+        readAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+    ConversationMessageInput:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1, maxLength: 2000 }
+    NotificationSummary:
+      type: object
+      required: [unreadConversations, notifications]
+      properties:
+        unreadConversations: { type: integer, minimum: 0 }
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationNotification"
+    ConversationNotification:
+      type: object
+      required: [conversationId, requestId, title, body, createdAt]
+      properties:
+        conversationId: { type: integer }
+        requestId: { type: integer }
+        title: { type: string }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }
+    DashboardSummary:
+      type: object
+      required: [openRequests, myRequests, newThisWeek, unlockedContacts]
+      properties:
+        openRequests: { type: integer }
+        myRequests: { type: integer }
+        newThisWeek: { type: integer }
+        unlockedContacts: { type: integer }
+        topCategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
+    CategoryCount:
+      type: object
+      required: [category, count]
+      properties:
+        category: { type: string }
+        count: { type: integer }
+    Subscription:
+      type: object
+      required: [status, planName, monthlyPrice, canUnlockContacts, activationRequested, paymentInstructions, paymentProvider, paymentStatus, accessExpiresAt, renewalReminder]
+      properties:
+        status:
+          type: string
+          enum: [inactive, active, past_due, canceled]
+        planName: { type: string }
+        monthlyPrice: { type: string }
+        canUnlockContacts: { type: boolean }
+        activationRequested: { type: boolean }
+        paymentInstructions: { type: string }
+        paymentProvider: { type: ["string", "null"] }
+        paymentStatus:
+          type: ["string", "null"]
+          enum: [created, pending, completed, canceled, failed, null]
+        accessExpiresAt: { type: ["string", "null"], format: date-time }
+        renewalReminder:
+          oneOf:
+            - $ref: "#/components/schemas/SubscriptionRenewalReminder"
+            - type: "null"
+    SubscriptionRenewalReminder:
+      type: object
+      required: [daysRemaining, accessExpiresAt, message]
+      properties:
+        daysRemaining: { type: integer, minimum: 1 }
+        accessExpiresAt: { type: string, format: date-time }
+        message: { type: string }
+    SubscriptionInput:
+      type: object
+      required: [plan, acceptTerms, acceptDigitalService, acceptRecurringPayments]
+      properties:
+        plan:
+          type: string
+          enum: [professional]
+        platform:
+          type: string
+          enum: [web, mobile]
+          default: web
+        acceptTerms:
+          type: boolean
+          const: true
+        acceptDigitalService:
+          type: boolean
+          const: true
+        acceptRecurringPayments:
+          type: boolean
+          const: true
+    PaymentCheckout:
+      type: object
+      required: [extOrderId, status, redirectUri]
+      properties:
+        extOrderId: { type: string }
+        status:
+          type: string
+          enum: [created, pending, completed, canceled, failed]
+        redirectUri: { type: ["string", "null"] }
+    PaymentStatus:
+      type: object
+      required: [extOrderId, status, subscriptionStatus, canUnlockContacts, accessExpiresAt]
+      properties:
+        extOrderId: { type: string }
+        status:
+          type: string
+          enum: [created, pending, completed, canceled, failed]
+        subscriptionStatus:
+          type: string
+          enum: [inactive, active, past_due, canceled]
+        canUnlockContacts: { type: boolean }
+        accessExpiresAt: { type: ["string", "null"], format: date-time }
+    PayuNotificationInput:
+      type: object
+      required: [order]
+      properties:
+        order:
+          type: object
+          required: [orderId, extOrderId, status, totalAmount, currencyCode]
+          properties:
+            orderId: { type: string }
+            extOrderId: { type: string }
+            status:
+              type: string
+              enum: [NEW, PENDING, WAITING_FOR_CONFIRMATION, COMPLETED, CANCELED]
+            totalAmount: { type: string }
+            currencyCode: { type: string }
+    SiteSettings:
+      type: object
+      required: [announcement, supportEmail, chatbotEnabled, chatbotName, chatbotWelcomeMessage]
+      properties:
+        announcement: { type: string }
+        supportEmail: { type: string, format: email }
+        chatbotEnabled: { type: boolean }
+        chatbotName: { type: string }
+        chatbotWelcomeMessage: { type: string }
+    ChatbotMessageInput:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string, minLength: 1, maxLength: 1000 }
+    ChatbotReply:
+      type: object
+      required: [reply]
+      properties:
+        reply: { type: string }
+    AdminOverview:
+      type: object
+      required: [totalUsers, customers, contractors, blockedUsers, totalRequests, openRequests, blockedRequests, newUsersThisWeek, newRequestsThisWeek, activeSubscriptions, completedPayments, completedRevenueGrosz]
+      properties:
+        totalUsers: { type: integer }
+        customers: { type: integer }
+        contractors: { type: integer }
+        blockedUsers: { type: integer }
+        totalRequests: { type: integer }
+        openRequests: { type: integer }
+        blockedRequests: { type: integer }
+        newUsersThisWeek: { type: integer }
+        newRequestsThisWeek: { type: integer }
+        activeSubscriptions: { type: integer }
+        completedPayments: { type: integer }
+        completedRevenueGrosz: { type: integer }
+    AdminSettings:
+      type: object
+      required: [announcement, supportEmail, chatbotEnabled, chatbotName, chatbotWelcomeMessage, chatbotFallbackMessage, chatbotKnowledgeBase, updatedAt]
+      properties:
+        announcement: { type: string }
+        supportEmail: { type: string, format: email }
+        chatbotEnabled: { type: boolean }
+        chatbotName: { type: string }
+        chatbotWelcomeMessage: { type: string }
+        chatbotFallbackMessage: { type: string }
+        chatbotKnowledgeBase: { type: string }
+        updatedAt: { type: string, format: date-time }
+    AdminSettingsUpdate:
+      type: object
+      required: [announcement, supportEmail, chatbotEnabled, chatbotName, chatbotWelcomeMessage, chatbotFallbackMessage, chatbotKnowledgeBase]
+      properties:
+        announcement: { type: string, maxLength: 300 }
+        supportEmail: { type: string, format: email }
+        chatbotEnabled: { type: boolean }
+        chatbotName: { type: string, minLength: 2, maxLength: 80 }
+        chatbotWelcomeMessage: { type: string, minLength: 2, maxLength: 500 }
+        chatbotFallbackMessage: { type: string, minLength: 2, maxLength: 500 }
+        chatbotKnowledgeBase: { type: string, maxLength: 12000 }
+    AdminSubscription:
+      type: object
+      required:
+        [id, profileId, contractorName, email, phone, status, planName, monthlyPrice, activationRequested, paymentProvider, paymentStatus, accessExpiresAt, updatedAt]
+      properties:
+        id: { type: integer }
+        profileId: { type: string }
+        contractorName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        companyName: { type: ["string", "null"] }
+        status:
+          type: string
+          enum: [inactive, active, past_due, canceled]
+        planName: { type: string }
+        monthlyPrice: { type: string }
+        activationRequested: { type: boolean }
+        paymentProvider: { type: ["string", "null"] }
+        paymentStatus:
+          type: ["string", "null"]
+          enum: [created, pending, completed, canceled, failed, null]
+        accessExpiresAt: { type: ["string", "null"], format: date-time }
+        updatedAt: { type: string, format: date-time }
+    AdminSubscriptionUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [active, inactive, canceled]
+    AdminSubscriptionStatusHistory:
+      type: object
+      required: [id, subscriptionId, profileId, previousStatus, newStatus, changedByAdminId, changedByAdminName, createdAt]
+      properties:
+        id: { type: integer }
+        subscriptionId: { type: integer }
+        profileId: { type: string }
+        previousStatus:
+          type: ["string", "null"]
+          enum: [inactive, active, past_due, canceled, null]
+        newStatus:
+          type: string
+          enum: [inactive, active, past_due, canceled]
+        changedByAdminId: { type: string }
+        changedByAdminName: { type: string }
+        createdAt: { type: string, format: date-time }
+    AdminUser:
+      type: object
+      required: [id, role, firstName, lastName, email, phone, verified, isBlocked, blockedAt, blockedReason, createdAt]
+      properties:
+        id: { type: string }
+        role:
+          type: string
+          enum: [customer, contractor]
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        companyName: { type: ["string", "null"] }
+        verified: { type: boolean }
+        isBlocked: { type: boolean }
+        blockedAt: { type: ["string", "null"], format: date-time }
+        blockedReason: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+    AdminUserUpdate:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [block, unblock]
+        reason: { type: ["string", "null"], minLength: 3 }
+    AdminRequest:
+      type: object
+      required: [id, customerId, customerName, customerEmail, customerPhone, title, description, category, location, address, budget, status, isBlocked, blockedAt, blockedReason, createdAt, photos]
+      properties:
+        id: { type: integer }
+        customerId: { type: string }
+        customerName: { type: string }
+        customerEmail: { type: string, format: email }
+        customerPhone: { type: string }
+        title: { type: string }
+        description: { type: string }
+        category:
+          type: string
+          enum: [hydraulik, elektryk, malarz, stolarz, plytkarz, brukarz, dekarz, wykonczenia, zlota-raczka, inne, remont, budowa, hydraulika, elektryka]
+        location: { type: string }
+        address: { type: ["string", "null"] }
+        budget: { type: string }
+        status:
+          type: string
+          enum: [open, in_progress, completed]
+        isBlocked: { type: boolean }
+        blockedAt: { type: ["string", "null"], format: date-time }
+        blockedReason: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        photos:
+          type: array
+          items: { type: string }
+    AdminRequestUpdate:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [block, unblock]
+        reason: { type: ["string", "null"], minLength: 3 }

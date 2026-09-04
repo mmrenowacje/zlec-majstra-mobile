@@ -1,0 +1,26 @@
+POLITYKA PRYWATNOŚCI APLIKACJI MOBILNEJ "ZLEĆ MAJSTRA"
+Data aktualizacji: 31.08.2026
+1. Administrator Danych Osobowych
+Administratorem jest MM Renowacje Monika Marcinkowska, ul. Kawiary 25/19, 62-200 Gniezno, NIP: 7842236876. Kontakt: aplikacjegniezno@int.pl oraz w sprawach RODO: aplikacjegniezno@int.pl 
+2. Zakres zbieranych danych
+Aplikacja rozróżnia Zleceniodawców i Wykonawców.
+a) Dane rejestracyjne: imię, nazwisko / firma, e-mail, numer telefonu, hasło zaszyfrowane.
+b) Dane profilu Wykonawcy: NIP, zakres usług, miasto działania, opis, portfolio, cennik.
+c) Dane zleceń: treść ogłoszenia, adres wykonania usługi, budżet, termin, zdjęcia i filmy dodane przez użytkownika.
+d) Dane komunikacyjne: historia czatu, oceny, opinie.
+e) Dane techniczne: adres IP, ID urządzenia, model telefonu, wersja systemu, dane diagnostyczne Firebase Crashlytics oraz lokalizacja GPS - tylko po wyrażeniu zgody.
+3. Cele i podstawy prawne przetwarzania RODO
+1.	Realizacja umowy (art. 6 ust. 1 lit. b RODO) - prowadzenie konta, publikacja i obsługa zleceń.
+2.	Zgoda (art. 6 ust. 1 lit. a RODO) - dostęp do lokalizacji, galerii, powiadomień PUSH, newslettera.
+3.	Uzasadniony interes administratora (art. 6 ust. 1 lit. f RODO) - bezpieczeństwo, przeciwdziałanie oszustwom, statystyka i rozwój aplikacji.
+4.	Obowiązek prawny (art. 6 ust. 1 lit. c RODO) - rozliczenia księgowe.
+4. Odbiorcy danych
+Dane Zleceniodawcy są widoczne dla Wykonawcy dopiero po zaakceptowaniu oferty i odwrotnie. Nie sprzedajemy danych. Zaufani podwykonawcy: Google LLC (Firebase, Google Maps, Google Play), Apple Inc., dostawca hostingu, dostawca e-mail.
+5. Okres przechowywania
+Dane konta do czasu usunięcia konta. Dane zleceń i korespondencji - 3 lata od zamknięcia zlecenia. Dane księgowe - 5 lat.
+6. Prawa użytkownika
+Prawo dostępu, sprostowania, usunięcia, ograniczenia, przenoszenia, sprzeciwu oraz wniesienia skargi do Prezesa UODO. Realizacja: aplikacjegniezno@int.pl w terminie 30 dni.
+7. Usuwanie konta
+Profil > Ustawienia > Usuń konto. Dane usuwane są w ciągu 30 dni.
+8. Cookies / SDK
+Aplikacja używa Firebase Analytics i Crashlytics. Możesz wyłączyć udostępnianie danych analitycznych w ustawieniach telefonu.

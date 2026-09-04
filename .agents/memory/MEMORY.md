@@ -1,0 +1,21 @@
+- [Testowanie Clerk w Express](clerk-express-testing.md) — integracyjne testy routerów muszą używać oznaczonej funkcji req.auth, tak jak middleware Clerk.
+- [Niestandardowe formularze Clerk](clerk-custom-form-captcha.md) — własny signup musi zawierać kontener CAPTCHA, inaczej wysyłka weryfikacji zatrzyma się przed emailem.
+- [Weryfikacja kont mobilnych](mobile-account-verification.md) — email potwierdza Clerk; weryfikacja telefonu wymaga osobnego dostawcy SMS.
+- [Nadawanie roli administratora](admin-role-provisioning.md) — rola admin jest nadawana poza publicznym profilem i nie może być nadpisana danymi użytkownika.
+- [Dostęp po płatności PayU](payu-subscription-entitlement.md) — tylko podpisany webhook nadaje 30 dni dostępu; wcześniejsza odnowa przedłuża od aktualnego końca.
+- [Brama wydania dla płatności sandbox](payment-sandbox-release-gate.md) — test integracji musi obejmować prawdziwy callback i natywny deep link, nie tylko wygenerowane URL-e.
+- [Parametry rejestracji Clerk](clerk-signup-parameters.md) — signUp.password przyjmuje tylko dane logowania; dane profilu zapisuj osobno po weryfikacji.
+- [Uprawnienia do opinii](review-eligibility.md) — opinię po zakończeniu może wystawić właściciel tylko fachowcowi, który wcześniej odblokował kontakt.
+- [Start nawigacji Expo](expo-start-route.md) — trasa `/` musi kierować według sesji i profilu; nie przekierowuj wylogowanych bezpośrednio do chronionej grupy kart.
+- [Zgoda kontaktowa w rozmowach](conversation-contact-consent.md) — odczyt, wiadomość i udostępnienie kontaktu klienta muszą wskazywać konkretny wątek fachowca.
+- [Zgoda na udostępnienie kontaktu](contact-sharing-consent.md) — abonament otwiera rozmowę, ale telefon i email ujawnia dopiero świadoma zgoda zleceniodawcy.
+- [Migracja starszej bazy Replit](legacy-replit-db-migration.md) — po usunięciu legacy DATABASE_URL porównuj dane i scalaj kopię, zamiast zakładać pustą bazę.
+- [Prywatność powiadomień rozmów](conversation-notification-privacy.md) — alert może wskazać rozmowę, ale nie może zawierać treści wiadomości ani danych kontaktowych.
+- [Zdjęcia profilu fachowca](contractor-profile-images.md) — zdjęcie lub logo przechowuje Clerk; API udostępnia tylko aktualny URL obrazu.
+- [Galeria zakończonych realizacji](completed-project-gallery.md) — zdjęcia realizacji wymagają zakończonego zlecenia i opinii dla dodającego je fachowca.
+- [Weryfikacja nowych urządzeń Clerk](clerk-device-trust.md) — kod po haśle przy logowaniu pochodzi z Device Trust, nie z rejestracyjnej weryfikacji emaila.
+- [Proxy Clerk zależne od środowiska](clerk-proxy-environments.md) — lokalne klienty nie mogą używać produkcyjnego proxy Clerk wyłączonego przez backend w development.
+- [Blokada edycji po zgodzie](request-edit-consent-lock.md) — treść zlecenia można zmieniać do pierwszego udostępnienia danych; później dozwolona pozostaje zmiana statusu.
+- [Android production build](android-production-build.md) — lokalny build Expo tworzy bundle preview; natywny plik .aab powstaje w procesie mobilnego builda Replit.
+- [Zależności w monorepo](monorepo-package-install.md) — instalator pakietów może celować w root; zależności artefaktu synchronizuj filtrowanym poleceniem pnpm.
+- [Zgodność Jest Expo](expo-jest-alignment.md) — preset `jest-expo` wymaga osobnego runnera Jest; dla SDK 54 trzymaj Jest 29 i zgodne typy.

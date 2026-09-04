@@ -1,0 +1,10 @@
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'hydraulik';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'elektryk';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'malarz';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'stolarz';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'plytkarz';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'brukarz';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'dekarz';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'wykonczenia';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'zlota-raczka';
+ALTER TYPE request_category ADD VALUE IF NOT EXISTS 'inne';
