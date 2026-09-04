@@ -1,25 +1,28 @@
 {
   "expo": {
     "name": "Zleć Majstra",
-    "slug": "zlemajstra",
+    "slug": "zlec-majstra",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "zlemajstra",
+    "scheme": "zlecmajstra",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/icon.png",
+      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F6F3ED"
     },
     "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.zlemajstra.app"
+      "supportsTablet": false
     },
     "android": {
-      "package": "com.zlecmajstra.app",
-      "versionCode": 1
+      "package": "pl.mmrenowacje.zlecmajstra",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#17211B"
+      }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -32,11 +35,17 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f9d9b1ba-f10d-4e9b-b349-19bf2d6944b3"
+      }
     }
   }
 }
