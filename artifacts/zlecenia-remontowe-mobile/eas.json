@@ -4,7 +4,8 @@
       "android": {
         "buildType": "app-bundle"
       },
-      "pnpm": "10.26.1"
+      "pnpm": "10.26.1",
+      "node": "20.19.4"
     }
   }
 }
