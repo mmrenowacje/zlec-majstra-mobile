@@ -2,7 +2,8 @@
   "build": {
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "image": "ubuntu-24.04-jdk-17-ndk-r27b"
       },
       "pnpm": "10.26.1",
       "node": "20.19.4"
