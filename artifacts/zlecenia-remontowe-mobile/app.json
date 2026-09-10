@@ -18,7 +18,7 @@
     },
     "android": {
       "package": "zlec.majstra",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#17211B"
