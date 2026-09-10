@@ -27,10 +27,13 @@ import { useColors } from '@/hooks/useColors';
 const domain = process.env.EXPO_PUBLIC_DOMAIN;
 if (domain) setBaseUrl(`https://${domain}`);
 
-const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const publishableKey =
+  process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+  'pk_live_Y2xlcmsuemxlY21hanN0cmEucGwk';
 const proxyUrl = __DEV__
   ? undefined
-  : process.env.EXPO_PUBLIC_CLERK_PROXY_URL || undefined;
+  : process.env.EXPO_PUBLIC_CLERK_PROXY_URL ||
+    'https://zlecmajstra.pl/api/__clerk';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -214,10 +217,11 @@ export default function RootLayout() {
           publishableKey={publishableKey ?? ''}
           tokenCache={tokenCache}
           proxyUrl={proxyUrl}
+          __experimental_disableNativeClientSync
         >
           <ClerkLoaded>
             <QueryClientProvider client={queryClient}>
-              <GestureHandlerRootView>
+              <GestureHandlerRootView style={{ flex: 1 }}>
                 <KeyboardProvider>
                   <RootLayoutNav />
                 </KeyboardProvider>
