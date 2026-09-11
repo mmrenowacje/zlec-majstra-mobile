@@ -1,9 +1,16 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { requestCategories, useCreateRequest, useRequestUploadUrl } from '@workspace/api-client-react';
+import {
+  getGetDashboardSummaryQueryKey,
+  getListRequestsQueryKey,
+  requestCategories,
+  useCreateRequest,
+  useRequestUploadUrl,
+} from '@workspace/api-client-react';
 import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 import { useColors } from '@/hooks/useColors';
 import { JPEG_CONTENT_TYPE, prepareJpeg, uploadPreparedImage } from '@/lib/image-upload';
@@ -11,6 +18,7 @@ import { router } from 'expo-router';
 
 export default function NewRequestScreen() {
   const colors = useColors();
+  const queryClient = useQueryClient();
   const create = useCreateRequest();
   const requestUpload = useRequestUploadUrl();
   const [title, setTitle] = useState('');
@@ -23,8 +31,8 @@ export default function NewRequestScreen() {
   const [error, setError] = useState('');
 
   const pickPhoto = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, quality: 0.8 });
-    if (!result.canceled) setPhotos(result.assets.slice(0, 2));
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, selectionLimit: 4, quality: 0.8 });
+    if (!result.canceled) setPhotos(result.assets.slice(0, 4));
   };
 
   const uploadPhoto = async (asset: ImagePicker.ImagePickerAsset) => {
@@ -51,10 +59,18 @@ export default function NewRequestScreen() {
       const created = await create.mutateAsync({
         data: { title, description, location, address, budget, category, photos: uploadedPhotos },
       });
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.push({ pathname: '/request/[id]', params: { id: String(created.id) } });
-    } catch {
-      setError('Nie udało się przesłać zdjęć lub opublikować zlecenia. Spróbuj ponownie.');
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: getListRequestsQueryKey() }),
+        queryClient.invalidateQueries({ queryKey: getGetDashboardSummaryQueryKey() }),
+      ]);
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {
+        // Haptics are optional and must not turn a successful save into an error.
+      }
+      router.replace({ pathname: '/request/[id]', params: { id: String(created.id) } });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Nie udało się opublikować zlecenia. Spróbuj ponownie.');
     }
   };
 

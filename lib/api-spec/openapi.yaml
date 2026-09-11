@@ -989,7 +989,8 @@ components:
         budget: { type: string }
         photos:
           type: array
-          items: { type: string }
+          maxItems: 4
+          items: { type: string, pattern: "^/objects/uploads/[a-f0-9-]+$" }
     JobRequestUpdate:
       type: object
       properties:
@@ -1006,7 +1007,7 @@ components:
           enum: [open, in_progress, completed]
         photos:
           type: array
-          maxItems: 2
+          maxItems: 4
           items: { type: string, pattern: "^/objects/uploads/[a-f0-9-]+$" }
     ReviewCandidate:
       type: object

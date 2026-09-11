@@ -188,11 +188,26 @@ router.use(
   },
 );
 
+function normalizeStoredRequestPhotos(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((photo): photo is string => typeof photo === "string");
+  }
+  if (typeof value !== "string") return [];
+
+  const trimmed = value.trim();
+  if (!trimmed) return [];
+  try {
+    return normalizeStoredRequestPhotos(JSON.parse(trimmed));
+  } catch {
+    return [trimmed];
+  }
+}
+
 function toPublicRequest(
   row: typeof jobRequestsTable.$inferSelect,
   revealContact = false,
 ) {
-  const photos = row.photos.flatMap((photo) => {
+  const photos = normalizeStoredRequestPhotos(row.photos).flatMap((photo) => {
     const objectPath = photo.startsWith("/api/storage/objects/uploads/")
       ? photo.slice("/api/storage".length)
       : photo;

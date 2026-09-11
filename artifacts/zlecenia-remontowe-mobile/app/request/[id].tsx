@@ -321,13 +321,13 @@ export default function RequestDetailScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsMultipleSelection: true,
-        selectionLimit: Math.max(1, 2 - storedPhotoPaths.length),
+        selectionLimit: Math.max(1, 4 - storedPhotoPaths.length),
       quality: 0.85,
     });
     if (result.canceled) return;
     try {
       setRequestPhotoError('');
-      const objectPaths = await Promise.all(result.assets.slice(0, 2 - storedPhotoPaths.length).map(async (asset) => {
+      const objectPaths = await Promise.all(result.assets.slice(0, 4 - storedPhotoPaths.length).map(async (asset) => {
         const image = await prepareJpeg(asset.uri);
         const prepared = await requestPhotoUpload.mutateAsync({ data: { name: 'zlecenie.jpg', size: image.size, contentType: JPEG_CONTENT_TYPE } });
         await uploadPreparedImage(prepared.uploadURL, image.uri);
@@ -397,7 +397,7 @@ export default function RequestDetailScreen() {
             </ScrollView>
           </View>
         ) : null}
-        {isCustomer && !editingLocked && storedPhotoPaths.length < 2 ? (
+        {isCustomer && !editingLocked && storedPhotoPaths.length < 4 ? (
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.section, { color: colors.foreground }]}>Zdjęcia zlecenia</Text>
             <Text style={[styles.body, { color: colors.mutedForeground }]}>Dodaj zdjęcia także do już opublikowanego zlecenia.</Text>
