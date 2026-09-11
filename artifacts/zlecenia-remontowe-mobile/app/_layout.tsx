@@ -24,8 +24,10 @@ import { ClerkLoaded, ClerkProvider, useAuth, useClerk } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useColors } from '@/hooks/useColors';
 
-const domain = process.env.EXPO_PUBLIC_DOMAIN;
-if (domain) setBaseUrl(`https://${domain}`);
+const apiBaseUrl = process.env.EXPO_PUBLIC_DOMAIN
+  ? `https://${process.env.EXPO_PUBLIC_DOMAIN}`
+  : 'https://zlecmajstra.pl';
+setBaseUrl(apiBaseUrl);
 
 const publishableKey =
   process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ||
