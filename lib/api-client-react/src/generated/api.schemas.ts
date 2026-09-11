@@ -196,6 +196,10 @@ export interface JobRequestInput {
   /** @minLength 3 */
   address: string;
   budget: string;
+  /**
+     * @maxItems 4
+     * @items.pattern ^/objects/uploads/[a-f0-9-]+$
+     */
   photos?: string[];
 }
 
@@ -240,7 +244,7 @@ export interface JobRequestUpdate {
   budget?: string;
   status?: JobRequestUpdateStatus;
   /**
-     * @maxItems 2
+     * @maxItems 4
      * @items.pattern ^/objects/uploads/[a-f0-9-]+$
      */
   photos?: string[];

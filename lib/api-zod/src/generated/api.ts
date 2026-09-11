@@ -165,6 +165,9 @@ export const createRequestBodyLocationMin = 2;
 
 export const createRequestBodyAddressMin = 3;
 
+export const createRequestBodyPhotosItemRegExp = new RegExp('^/objects/uploads/[a-f0-9-]+$');
+export const createRequestBodyPhotosMax = 4;
+
 
 
 export const CreateRequestBody = zod.object({
@@ -174,7 +177,7 @@ export const CreateRequestBody = zod.object({
   "location": zod.string().min(createRequestBodyLocationMin),
   "address": zod.string().min(createRequestBodyAddressMin),
   "budget": zod.string(),
-  "photos": zod.array(zod.string()).optional()
+  "photos": zod.array(zod.string().regex(createRequestBodyPhotosItemRegExp)).max(createRequestBodyPhotosMax).optional()
 })
 
 export const CreateRequestResponse = zod.object({
@@ -234,7 +237,7 @@ export const updateRequestBodyDescriptionMin = 10;
 export const updateRequestBodyAddressMin = 3;
 
 export const updateRequestBodyPhotosItemRegExp = new RegExp('^/objects/uploads/[a-f0-9-]+$');
-export const updateRequestBodyPhotosMax = 2;
+export const updateRequestBodyPhotosMax = 4;
 
 
 
