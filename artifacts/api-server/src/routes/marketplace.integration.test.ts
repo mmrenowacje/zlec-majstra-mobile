@@ -4,7 +4,6 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import { after, before, describe, it, mock } from "node:test";
-import { clerkClient } from "@clerk/express";
 import express, { type Request } from "express";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { chromium, type Page } from "playwright";
@@ -22,7 +21,7 @@ import {
   subscriptionStatusHistoryTable,
   unlockedContactsTable,
 } from "@workspace/db";
-import marketplaceRouter from "./marketplace";
+import marketplaceRouter, { marketplaceDependencies } from "./marketplace";
 
 const testRunId = `${process.pid}-${Date.now()}`;
 const ownerId = `contact-test-owner-${testRunId}`;
@@ -1125,8 +1124,8 @@ describe("marketplace contact authorization", () => {
     });
 
     const deleteIdentity = mock.method(
-      clerkClient.users,
-      "deleteUser",
+      marketplaceDependencies,
+      "deleteClerkUser",
       async () => ({ id: contractorId }) as never,
     );
     const deleted = await api(adminId, `/admin/users/${contractorId}`, {

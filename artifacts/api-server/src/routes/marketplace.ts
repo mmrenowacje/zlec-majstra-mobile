@@ -127,6 +127,10 @@ const SUBSCRIPTION_REMINDER_DAYS = 3;
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const configuredAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() ?? "";
 
+export const marketplaceDependencies = {
+  deleteClerkUser: (profileId: string) => clerkClient.users.deleteUser(profileId),
+};
+
 const router: IRouter = Router();
 const subscriptionHistoryAdminProfiles = alias(
   profilesTable,
@@ -2107,7 +2111,7 @@ router.delete(
       .where(eq(profilesTable.id, target.id));
 
     try {
-      await clerkClient.users.deleteUser(target.id);
+      await marketplaceDependencies.deleteClerkUser(target.id);
     } catch (error) {
       if ((error as { status?: number }).status !== 404) {
         req.log.error(
