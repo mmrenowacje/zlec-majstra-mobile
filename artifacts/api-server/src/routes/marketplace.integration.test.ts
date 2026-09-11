@@ -3,7 +3,8 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
-import { after, before, describe, it } from "node:test";
+import { after, before, describe, it, mock } from "node:test";
+import { clerkClient } from "@clerk/express";
 import express, { type Request } from "express";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { chromium, type Page } from "playwright";
@@ -1123,9 +1124,15 @@ describe("marketplace contact authorization", () => {
       body: "Wiadomość do usunięcia z kontem",
     });
 
+    const deleteIdentity = mock.method(
+      clerkClient.users,
+      "deleteUser",
+      async () => ({ id: contractorId }) as never,
+    );
     const deleted = await api(adminId, `/admin/users/${contractorId}`, {
       method: "DELETE",
     });
+    deleteIdentity.mock.restore();
     assert.equal(deleted.status, 204);
     const inaccessible = await api(
       ownerId,
