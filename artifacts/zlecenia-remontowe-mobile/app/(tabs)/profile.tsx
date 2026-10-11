@@ -11,6 +11,18 @@ import { useEffect, useState } from 'react';
 
 export default function ProfileScreen() {
   const colors = useColors();
+  const openTutorials = async () => {
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    if (!domain) {
+      Alert.alert('Brak konfiguracji', 'Nie ustawiono adresu serwera aplikacji.');
+      return;
+    }
+    try {
+      await WebBrowser.openBrowserAsync(new URL('/poradniki', `https://${domain}`).toString());
+    } catch {
+      Alert.alert('Nie udało się otworzyć poradników', 'Sprawdź połączenie z internetem i spróbuj ponownie.');
+    }
+  };
   const { signOut } = useClerk();
   const { user } = useUser();
   const queryClient = useQueryClient();
@@ -333,6 +345,15 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
       )}
+      <Pressable
+        testID="open-video-guides"
+        accessibilityRole="button"
+        onPress={() => void openTutorials()}
+        style={[styles.signOut, { borderColor: colors.border }]}
+      >
+        <Feather name="play-circle" size={18} color={colors.primary} />
+        <Text style={[styles.signOutText, { color: colors.foreground }]}>Instrukcje wideo</Text>
+      </Pressable>
       <Pressable
         testID="sign-out"
         onPress={async () => {
