@@ -8,6 +8,10 @@
       "environment": "production",
       "node": "20.19.4",
       "pnpm": "10.26.1",
+      "env": {
+        "ANDROID_APK_PUBLIC_URL": "https://zlecmajstra.pl",
+        "EXPO_PUBLIC_DOMAIN": "zlecmajstra.pl"
+      },
       "android": {
         "buildType": "apk",
         "image": "ubuntu-24.04-jdk-17-ndk-r27b"
